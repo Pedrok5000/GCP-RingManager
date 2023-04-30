@@ -8,7 +8,7 @@ This document aims to explain some of the decisions made during system architect
 
 The ring manager application always starts on port 8000 at a given IP address (depends on the VM on which the application runs) and implements two services: `RegisterServiceImpl` and `GetServerServiceImpl`.
 
-The `RegisterServiceImpl` service concerns the communication between kvServer and the ring manager, that is, it implements the contract that has the operation of registering kvServer in the ring manager, the operation for kvServer to obtain its successor and the operation to inform the failure of kvServer successor to ring manager. All these operations need to access the ring's information and for that there is the `RingInfo` class that keeps a list with the kvServers as well as the number of kvServers that the ring supports (in our implementation N = 3).
+The `RegisterServiceImpl` service concerns the communication between kvServer and the ring manager, that is, it implements the contract that has the operation of registering kvServer in the ring manager, the operation for kvServer to obtain its successor and the operation to inform the failure of kvServer successor to ring manager. All these operations need to access the ring's information and for that there is the `RingInfo` class that keeps a list with the kvServers as well as the number of kvServers that the ring supports (in this implementation N = 3).
 
 The operations themselves have to ensure that there are no concurrency issues, for example when adding servers to the list. To this end, the operations have the keyword `synchronized` which guarantees that only one gRPC thread changes the list of servers at any given time.
 
@@ -34,4 +34,9 @@ Successor failure is detected when trying to create a channel between a kvServer
 
 ## Client:
 
-The client application is very simple, when running it connects to the ring manager and if
+The client application is very simple, when running it connects to the ring manager and if the ring is formed, it makes a request to obtain a kvServer. Following the logic of kvServer registration in the ring manager, if the ring is not formed, the client makes a request every 10 seconds to obtain the kvServer. With a response to the previous request, the client connects to the kvServer and a menu is presented with options for writing a KeyValue pair, for reading a value or for terminating the application.
+The write operation asks the user to insert a value in JSON format and a random hash is generated as a key. This value can be consulted later through the reading operation that receives the previously generated hash as a parameter.
+
+In this implementation, the assumption is made that each client only communicates with one and only one kvServer, making it impossible to switch to another server without restarting the client application.
+
+**Usage:** `java -jar ClientApp-1.0-SNAPSHOT-jar-with-dependencies.jar <ring manager IP>`
