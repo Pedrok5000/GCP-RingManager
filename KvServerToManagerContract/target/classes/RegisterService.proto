@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "kvServerToManager";
+
+package registerservice;
+
+service RegisterService {
+  rpc registerServer (KvServerInfo) returns (Reply);
+  rpc getNextServer (KvServerInfo) returns (NextServer);
+  rpc failInform (KvServerInfo) returns (NextServer);
+}
+
+message KvServerInfo {
+  int32 serverPort = 1;
+  string serverIP = 2;
+}
+
+message Reply {
+  string reply = 1;
+}
+
+message NextServer {
+  int32 nextServerPort = 1;
+  string nextServerIP = 2;
+}

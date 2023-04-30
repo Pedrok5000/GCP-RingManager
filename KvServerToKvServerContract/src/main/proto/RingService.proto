@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "kvServerToKvServer";
+
+package ringservice;
+
+service RingService {
+  rpc writeNext (WriteRequest) returns (Reply);
+  rpc readNext (ReadRequest) returns (Result);
+}
+
+message WriteRequest {
+  string key = 1;
+  string value = 2;
+  string originServer = 3;
+}
+
+message ReadRequest {
+  string key = 1;
+  string originServer = 2;
+}
+
+message Result {
+  string result = 1;
+}
+
+message Reply {
+  string reply = 1;
+}
